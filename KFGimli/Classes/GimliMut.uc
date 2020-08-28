@@ -1,8 +1,8 @@
-// -------------------------------------------------------------
+//--------------------------------------------------------------
 // Killing Floor Mutator
 // Repair "Gimli That Axe!" Steam Achievement on Server-side
 // Created by Heatray, https://s.team/p/kff-tvmg
-// -------------------------------------------------------------
+//--------------------------------------------------------------
 
 class GimliMut extends Mutator;
 
@@ -25,15 +25,14 @@ function ModifyPlayer(Pawn Other)
 		steamID = SteamStatsAndAchievements.GetSteamUserID();
 
 		if (SteamStatsAndAchievements.Achievements[208].bCompleted != 1)
-		{
-			Log("GIMLI FIX: Checking for" @ userName @ "id=" $ steamID);
 			SetupWebAPI();
-		}
 	}
 }
 
 function SetupWebAPI()
 {
+	Log("GIMLI FIX: Checking for" @ userName @ "id=" $ steamID);
+
 	if (SteamWebApi == None)
 		SteamWebApi = Spawn(class'KFSteamWebApiFix', self);
 
@@ -46,5 +45,5 @@ DefaultProperties
 {
 	GroupName="KF-GimliMut"
 	FriendlyName="Achievement Fix [S]: Gimli That Axe!"
-	Description="Repair Gimli That Axe! achievement on server-side|Get the Not-a-war-hammer Achievement in Dwarfs!? F2P|Created by Heatray, 25.08.2020"
+	Description="Repair Gimli That Axe! achievement on server-side|Get the Not-a-war-hammer Achievement in Dwarfs!? F2P|Created by Heatray, 28.08.2020, v1.1"
 }
