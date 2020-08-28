@@ -1,6 +1,6 @@
 //--------------------------------------------------------------
 // Killing Floor Mutator
-// Repair "Gimli That Axe!" Steam Achievement on Server-side
+// Repair "Gimli That Axe!" Steam Achievement on server-side
 // Created by Heatray, https://s.team/p/kff-tvmg
 //--------------------------------------------------------------
 
@@ -8,7 +8,7 @@ class GimliMut extends Mutator;
 
 var KFPlayerController Player;
 var KFSteamStatsAndAchievements SteamStatsAndAchievements;
-var KFSteamWebApiFix SteamWebApi;
+var KFSteamWebApiNew SteamWebApi;
 var string userName;
 var string steamID;
 
@@ -34,7 +34,7 @@ function SetupWebAPI()
 	Log("GIMLI FIX: Checking for" @ userName @ "id=" $ steamID);
 
 	if (SteamWebApi == None)
-		SteamWebApi = Spawn(class'KFSteamWebApiFix', self);
+		SteamWebApi = Spawn(class'KFSteamWebApiNew', self);
 
 	SteamWebApi.AchievementReport = SteamStatsAndAchievements.OnAchievementReport;
 	SteamWebApi.steamName = userName;

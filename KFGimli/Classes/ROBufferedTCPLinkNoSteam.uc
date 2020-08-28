@@ -1,4 +1,4 @@
-class ROBufferedTCPLinkFix extends ROBufferedTCPLink;
+class ROBufferedTCPLinkNoSteam extends ROBufferedTCPLink;
 
 function Resolved(IpAddr Addr)
 {

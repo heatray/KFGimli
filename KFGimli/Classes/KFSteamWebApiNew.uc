@@ -1,65 +1,28 @@
-class KFSteamWebApiFix extends KFSteamWebApi;
+class KFSteamWebApiNew extends KFSteamWebApi;
 
 var string steamName;
 var string achievementName;
 var string jsonSuccess;
 var string jsonAchieved;
 
-var ROBufferedTCPLinkFix myLinkFix;
-
-protected function ROBufferedTCPLinkFix CreateNewLinkFix()
-{
-	local class<ROBufferedTCPLinkFix> NewLinkClass;
-	local ROBufferedTCPLinkFix NewLink;
-
-	if (LinkClassName != "")
-		NewLinkClass = class<ROBufferedTCPLinkFix>(DynamicLoadObject(LinkClassName, class'Class'));
-
-	if (NewLinkClass != None)
-		NewLink = Spawn(NewLinkClass);
-
-	NewLink.ResetBuffer();
-
-	return NewLink;
-}
-
-function GetAchievements(string steamIDIn)
-{
-	steamID = steamIDIn;
-	playerStats = "";
-
-	if(myLinkFix == None)
-		myLinkFix = CreateNewLinkFix();
-
-	if(myLinkFix != None)
-	{
-		myLinkFix.ServerIpAddr.Port = 0;
-
-		sendGet = true;
-		myLinkFix.Resolve(steamAPIAddr);  // NOTE: This is a non-blocking operation
-
-		SetTimer(0.25, true);
-	}
-}
-
 event Timer()
 {
 	local string command;
 	local bool bSuccess;
 
-	if (myLinkFix != None)
+	if (myLink != None)
 	{
-		if (myLinkFix.ServerIpAddr.Port != 0)
+		if (myLink.ServerIpAddr.Port != 0)
 		{
-			if (myLinkFix.IsConnected())
+			if (myLink.IsConnected())
 			{
 				if (sendGet)
 				{
-					command = getRequestLeft$appid$getRequestSteamID$steamID$getRequestRight$myLinkFix.CRLF$"Host: "$steamAPIAddr$myLinkFix.CRLF$myLinkFix.CRLF;
-					myLinkFix.SendCommand(command);
+					command = getRequestLeft$appid$getRequestSteamID$steamID$getRequestRight$myLink.CRLF$"Host: "$steamAPIAddr$myLink.CRLF$myLink.CRLF;
+					myLink.SendCommand(command);
 
 					pageWait = true;
-					myLinkFix.WaitForCount(1,20,1); // 20 sec timeout
+					myLink.WaitForCount(1,20,1); // 20 sec timeout
 					sendGet = false;
 				}
 			}
@@ -73,10 +36,10 @@ event Timer()
 			}
 		}
 
-		if (myLinkFix.PeekChar() != 0)
+		if (myLink.PeekChar() != 0)
 		{
 			pageWait = false;
-			playerStats = myLinkFix.InputBuffer;
+			playerStats = myLink.InputBuffer;
 			bSuccess = (InStr(playerStats, jsonSuccess) != -1);
 
 			if (bSuccess)
@@ -94,8 +57,8 @@ event Timer()
 			Log("webapi********playerstats", 'DevNet');
 			HasAchievement(achievementName);
 
-			myLinkFix.DestroyLink();
-			myLinkFix = none;
+			myLink.DestroyLink();
+			myLink = none;
 
 			return;
 		}
@@ -104,8 +67,8 @@ event Timer()
 	if (myRetryCount >= myRetryMax)
 	{
 		Log("GIMLI FIX: Too Many Retries" @ steamName @ "id=" $ steamID);
-		myLinkFix.DestroyLink();
-		myLinkFix = none;
+		myLink.DestroyLink();
+		myLink = none;
 		return;
 	}
 	else
@@ -140,5 +103,5 @@ DefaultProperties
 	jsonAchieved="\"apiname\":\"NotAWarhammer\",\"achieved\":1"
 	myRetryMax=5
 
-	LinkClassName="KFGimli.ROBufferedTCPLinkFix"
+	LinkClassName="KFGimli.ROBufferedTCPLinkNoSteam"
 }
