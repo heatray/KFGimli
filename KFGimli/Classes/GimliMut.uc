@@ -6,39 +6,41 @@
 
 class GimliMut extends Mutator;
 
-var KFPlayerController Player;
-var KFSteamStatsAndAchievements SteamStatsAndAchievements;
-var KFSteamWebApiNew SteamWebApi;
-var string userName;
-var string steamID;
+function PostBeginPlay()
+{
+	Log("GIMLI FIX: Init");
+}
 
 function ModifyPlayer(Pawn Other)
 {
+	local KFPlayerController Player;
+	local KFSteamStatsAndAchievements SteamStats;
+	local KFSteamWebApiNew SteamWebApi;
+	local string userName;
+	local string steamID;
+
 	Super.ModifyPlayer(Other);
 
 	Player = KFPlayerController(Other.Controller);
-	SteamStatsAndAchievements = KFSteamStatsAndAchievements(Other.PlayerReplicationInfo.SteamStatsAndAchievements);
+	SteamStats = KFSteamStatsAndAchievements(Other.PlayerReplicationInfo.SteamStatsAndAchievements);
 
-	if (Player != None && SteamStatsAndAchievements != None)
+	if (Player != None && SteamStats != None)
 	{
 		userName = Player.PlayerOwnerName;
-		steamID = SteamStatsAndAchievements.GetSteamUserID();
+		steamID = SteamStats.GetSteamUserID();
 
-		if (SteamStatsAndAchievements.Achievements[208].bCompleted != 1)
-			SetupWebAPI();
+		if (SteamStats.Achievements[208].bCompleted != 1)
+		{
+			Log("GIMLI FIX: Checking for" @ userName @ "id=" $ steamID);
+
+			if (SteamWebApi == None)
+				SteamWebApi = Spawn(class'KFSteamWebApiNew', self);
+
+			SteamWebApi.AchievementReport = SteamStats.OnAchievementReport;
+			SteamWebApi.steamName = userName;
+			SteamWebApi.GetAchievements(steamID);
+		}
 	}
-}
-
-function SetupWebAPI()
-{
-	Log("GIMLI FIX: Checking for" @ userName @ "id=" $ steamID);
-
-	if (SteamWebApi == None)
-		SteamWebApi = Spawn(class'KFSteamWebApiNew', self);
-
-	SteamWebApi.AchievementReport = SteamStatsAndAchievements.OnAchievementReport;
-	SteamWebApi.steamName = userName;
-	SteamWebApi.GetAchievements(steamID);
 }
 
 DefaultProperties
