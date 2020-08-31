@@ -58,6 +58,6 @@ function ModifyPlayer(Pawn Other)
 DefaultProperties
 {
 	GroupName="KF-GimliMut"
-	FriendlyName="Achievement Fix [S]: Gimli That Axe!"
-	Description="Repair Gimli That Axe! achievement on server-side|Get the Not-a-war-hammer Achievement in Dwarfs!? F2P|Created by Heatray, 28.08.2020, v1.1"
+	FriendlyName="Achievement Fix: Gimli That Axe!"
+	Description="Repair Gimli That Axe! achievement on server-side|Get the Not-a-war-hammer Achievement in Dwarfs!? F2P|Created by Heatray, 31.08.2020, v1.2"
 }
