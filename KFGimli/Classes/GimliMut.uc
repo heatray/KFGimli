@@ -6,6 +6,8 @@
 
 class GimliMut extends Mutator;
 
+var array<string> aChecks;
+
 function PostBeginPlay()
 {
 	Log("GIMLI FIX: Init");
@@ -18,6 +20,8 @@ function ModifyPlayer(Pawn Other)
 	local KFSteamWebApiNew SteamWebApi;
 	local string userName;
 	local string steamID;
+	local int i;
+	local bool bChecked;
 
 	Super.ModifyPlayer(Other);
 
@@ -29,9 +33,17 @@ function ModifyPlayer(Pawn Other)
 		userName = Player.PlayerOwnerName;
 		steamID = SteamStats.GetSteamUserID();
 
-		if (SteamStats.Achievements[208].bCompleted != 1)
+		for (i = 0; i < aChecks.Length; ++i)
+			if (aChecks[i] == steamID)
+				bChecked = true;
+
+		if (SteamStats.Achievements[208].bCompleted != 1 && !bChecked)
 		{
-			Log("GIMLI FIX: Checking for" @ userName @ "id=" $ steamID);
+			i = aChecks.Length;
+			aChecks.Insert(i, 1);
+			aChecks[i] = steamID;
+
+			Log("GIMLI FIX: Checking -" @ userName @ "id=" $ steamID);
 
 			if (SteamWebApi == None)
 				SteamWebApi = Spawn(class'KFSteamWebApiNew', self);
