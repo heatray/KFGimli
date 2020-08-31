@@ -3,12 +3,12 @@ class KFSteamWebApiNew extends KFSteamWebApi;
 var string steamName;
 var string achievementName;
 var string jsonSuccess;
+var string jsonPrivate;
 var string jsonAchieved;
 
 event Timer()
 {
 	local string command;
-	local bool bSuccess;
 
 	if (myLink != None)
 	{
@@ -40,15 +40,18 @@ event Timer()
 		{
 			pageWait = false;
 			playerStats = myLink.InputBuffer;
-			bSuccess = (InStr(playerStats, jsonSuccess) != -1);
 
-			if (bSuccess)
+			if (InStr(playerStats, jsonSuccess) != -1)
 			{
 				Log("webapi EOF reached", 'DevNet');
 			}
 			else
 			{
-				Log("GIMLI FIX: Failed for" @ steamName @ "id=" $ steamID);
+				if (InStr(playerStats, jsonPrivate) != -1)
+					Log("GIMLI FIX: Not Public -" @ steamName @ "id=" $ steamID);
+				else
+					Log("GIMLI FIX: Failed -" @ steamName @ "id=" $ steamID);
+
 				Log("webapi*********** still need to wait", 'DevNet');
 				return;
 			}
@@ -87,11 +90,11 @@ function bool HasAchievement(string achievement)
 
 	if (bCompleted)
 	{
-		Log("GIMLI FIX: Unlocking for" @ steamName @ "id=" $ steamID);
+		Log("GIMLI FIX: Unlocking -" @ steamName @ "id=" $ steamID);
 		return true;
 	}
 
-	Log("GIMLI FIX: Sorry for" @ steamName @ "id=" $ steamID);
+	Log("GIMLI FIX: Not Achieved -" @ steamName @ "id=" $ steamID);
 	return false;
 }
 
@@ -100,6 +103,7 @@ DefaultProperties
 	steamName="Player"
 	achievementName="NotAWarhammer"
 	jsonSuccess="\"success\":true"
+	jsonPrivate="\"error\":\"Profile is not public\""
 	jsonAchieved="\"apiname\":\"NotAWarhammer\",\"achieved\":1"
 	myRetryMax=5
 
